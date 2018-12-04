@@ -13,6 +13,12 @@ package com.w3engineers.travistest;
  *  ****************************************************************************
  */
 
+import android.util.Log;
+
 public class MainAdapter {
     public MainAdapter(){}
+
+    public void printTravisLog(){
+        Log.e("","");
+    }
 }
