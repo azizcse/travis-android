@@ -21,4 +21,7 @@ public class MainAdapter {
     public void printTravisLog(){
         Log.e("","");
     }
+
+
+    public void setBackground(){}
 }
