@@ -1,22 +1,50 @@
 language: android
 jdk: oraclejdk8
-sudo: require
+sudo: false
+
+eve:
+  globle:
+    - ANDROID_API_LEVEL=27
+    - ANDROID_EMULATOR_LEVEL=18
+    - ANDROID_BUILD_TOOLS_VERSION=28.0.3
+    - ABI_INSTALL_TIMEOUT=20
+    - ANDROID_ABI=armeabi-v7a
+    - ANDROID_TAG=google_apis
+    - QEMU_AUDIO_DIR=none
 
 android:
   components:
+    - tools
     - platform-tools
     - tools
-    - build-tools-28.0.3
-    - android-21
-    - android-28
-    - sys-img-armeabi-v7a-android-23
+    - build-tools-$ANDROID_BUILD_TOOLS_VERSION
+    - android-$ANDROID_API_LEVEL
+    - android-$ANDROID_EMULATOR_LEVEL
+    - extra-android-support
+    - extra-google-m2repository
     - extra-android-m2repository
+    - sys-img-$ANDROID_ABI-google_apis-$ANDROID_EMULATOR_LEVEL
+
+licenses:
+  - android-sdk-preview-license-.+
+  - android-sdk-license-.+
+  - google-gdk-license-.+
+
+cache:
+  directories:
+    - "$HOME/.gradle/caches/"
+    - "$HOME/.gradle/wrapper/"
+    - "$HOME/.android/build-cache"
 
 before_script:
-  # Create and start emulator
-  - echo no | android create avd --force -n test -t android-21 --abi armeabi-v7a
-  - emulator -avd test -no-skin -no-audio -no-window &
+  - android list targets
+  - echo no | android create avd --force -n test -t "android-"$ANDROID_EMULATOR_LEVEL --abi $ANDROID_ABI --tag $ANDROID_TAG
+  - emulator -avd test -no-window &
   - android-wait-for-emulator
-  - adb shell input keyevent 82 &
 
-script: ./gradlew connectedAndroidTest
+script:
+  - ./gradlew dependencyCheckAnalyze build
+  - adb shell input keyevent 82
+  - ./gradlew connectedCheck -PdisablePreDex --stacktrace
+
+after_failure: cat $TRAVIS_BUILD_DIR/app/gen_build/reports/lin
