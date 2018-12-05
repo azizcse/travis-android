@@ -25,5 +25,5 @@ public class MainAdapter {
 
     public void setBackground(){}
 
-    public void removeItem(){}
+
 }
